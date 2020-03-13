@@ -6,6 +6,8 @@ Allows users to set up many kinds (currently two) of notifications which
 cause the generic notification as defined in the RuneLite config (just
 like, for example, the idle notifier).
 
+Icons are placeholders right now.
+
 ## Notification types
 
 This is a list of the types of notifications you can use
