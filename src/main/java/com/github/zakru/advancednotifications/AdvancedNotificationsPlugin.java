@@ -61,9 +61,6 @@ public class AdvancedNotificationsPlugin extends Plugin
 	private ClientToolbar clientToolbar;
 
 	@Inject
-	private AdvancedNotificationsConfig config;
-
-	@Inject
 	private ConfigManager configManager;
 
 	private AdvancedNotificationsPluginPanel pluginPanel;
@@ -173,12 +170,6 @@ public class AdvancedNotificationsPlugin extends Plugin
 		int c = 0;
 		for (Item i : items) if (i.getId() == id) c += Math.max(i.getQuantity(), 1);
 		return c;
-	}
-
-	@Provides
-	AdvancedNotificationsConfig provideConfig(ConfigManager configManager)
-	{
-		return configManager.getConfig(AdvancedNotificationsConfig.class);
 	}
 
 	public void updateConfig()
