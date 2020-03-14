@@ -1,46 +1,27 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.*;
+import com.github.zakru.advancednotifications.DraggableContainer;
+import com.github.zakru.advancednotifications.EmptyNotification;
+import com.github.zakru.advancednotifications.InventoryComparator;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 {
-	private static final ImageIcon DELETE_ICON;
-	private static final ImageIcon DELETE_HOVER_ICON;
-
-	private static final Border TYPE_BORDER = new CompoundBorder(
-		new MatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
-		new EmptyBorder(8, 8, 8, 8));
-
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
-	private final JSpinner countSpinner = new JSpinner();
-
-	static
-	{
-		final BufferedImage addIcon
-			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
-		DELETE_ICON = new ImageIcon(addIcon);
-		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(addIcon, 0.53f));
-	}
+	private final JSpinner countSpinner = new JSpinner(spinnerModel);
 
 	public EmptyNotificationPanel(EmptyNotification notification, DraggableContainer container)
 	{
 		super(notification, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
+
+		DefaultTypePanel typePanel = new DefaultTypePanel(this, "Empty Space");
+		typePanel.addDefaultVisualListener();
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -76,7 +57,7 @@ public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 
 		contentPanel.add(paramsPanel, BorderLayout.SOUTH);
 
-		add(new DefaultTypePanel(this, "Empty Space"), BorderLayout.NORTH);
+		add(typePanel, BorderLayout.NORTH);
 		add(contentPanel, BorderLayout.CENTER);
 	}
 }

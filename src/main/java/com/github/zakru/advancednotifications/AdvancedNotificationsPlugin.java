@@ -131,8 +131,8 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 		}
 
 		Gson gson = new GsonBuilder()
-		.registerTypeHierarchyAdapter(Notification.class, new NotificationAdapter(this))
-		.create();
+			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
+			.create();
 
 		notifications = gson.fromJson(json, new TypeToken<ArrayList<Notification>>(){}.getType());
 	}
@@ -191,9 +191,9 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 		}
 
 		final Gson gson = new GsonBuilder()
-		.registerTypeHierarchyAdapter(Notification.class, new NotificationAdapter(this))
-		.create();
-		final String json = gson.toJson(notifications);
+			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
+			.create();
+		final String json = gson.toJson(notifications, new TypeToken<ArrayList<Notification>>(){}.getType());
 		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY, json);
 	}
 

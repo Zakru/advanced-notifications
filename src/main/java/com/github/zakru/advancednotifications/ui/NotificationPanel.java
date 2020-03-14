@@ -1,8 +1,6 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
-import com.github.zakru.advancednotifications.DraggableContainer;
-import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.*;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -94,22 +92,6 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 			setOpaque(false);
 			setBorder(TYPE_BORDER);
 			addMouseListener(new DragStarter(panel));
-			addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mousePressed(MouseEvent e)
-				{
-					setOpaque(true);
-					repaint();
-				}
-
-				@Override
-				public void mouseReleased(MouseEvent e)
-				{
-					setOpaque(false);
-					repaint();
-				}
-			});
 
 			JLabel typeLabel = new JLabel(typeName);
 			typeLabel.setForeground(Color.WHITE);
@@ -147,6 +129,26 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 			add(typeLabel, BorderLayout.WEST);
 			add(actions, BorderLayout.EAST);
 		}
+
+		public void addDefaultVisualListener()
+		{
+			addMouseListener(new MouseAdapter()
+			{
+				@Override
+				public void mousePressed(MouseEvent e)
+				{
+					((DefaultTypePanel)e.getComponent()).setOpaque(true);
+					e.getComponent().repaint();
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e)
+				{
+					((DefaultTypePanel)e.getComponent()).setOpaque(false);
+					e.getComponent().repaint();
+				}
+			});
+		}
 	}
 
 	protected final N notification;
@@ -158,5 +160,14 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 		this.notification = notification;
 		this.container = container;
 		plugin = notification.getPlugin();
+	}
+
+	public static NotificationPanel buildPanel(AdvancedNotificationsPlugin plugin, Notification notif)
+	{
+		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, plugin);
+		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, plugin);
+		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, plugin);
+
+		return null;
 	}
 }

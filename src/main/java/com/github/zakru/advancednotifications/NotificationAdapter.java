@@ -21,9 +21,9 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		this.plugin = plugin;
 		gson = new GsonBuilder()
-			.registerTypeHierarchyAdapter(InventoryComparator.Pointer.class, new ComparatorAdapter())
+			.registerTypeAdapter(Notification.class, this)
+			.registerTypeAdapter(InventoryComparator.Pointer.class, new ComparatorAdapter())
 			.create();
-		System.out.println(gson.toJson(new InventoryComparator.Pointer(InventoryComparator.COUNT_DECREASED)));
 	}
 
 	@Override
@@ -70,6 +70,8 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 				return gson.fromJson(in, ItemNotification.class);
 			case 1:
 				return gson.fromJson(in, EmptyNotification.class);
+			case 2:
+				return gson.fromJson(in, NotificationGroup.class);
 			default:
 				return null;
 		}
@@ -79,12 +81,14 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		if (o instanceof ItemNotification) gson.toJson(o, ItemNotification.class, out);
 		else if (o instanceof EmptyNotification) gson.toJson(o, EmptyNotification.class, out);
+		else if (o instanceof NotificationGroup) gson.toJson(o, NotificationGroup.class, out);
 	}
 
 	private int idOf(Notification o)
 	{
 		if (o instanceof ItemNotification) return 0;
 		if (o instanceof EmptyNotification) return 1;
+		if (o instanceof NotificationGroup) return 2;
 		return -1;
 	}
 }

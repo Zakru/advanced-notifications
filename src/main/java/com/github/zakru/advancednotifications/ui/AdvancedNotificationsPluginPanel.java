@@ -1,9 +1,6 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
-import com.github.zakru.advancednotifications.EmptyNotification;
-import com.github.zakru.advancednotifications.ItemNotification;
-import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.*;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 
@@ -66,6 +63,16 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 				rebuild();
 			}
 		}));
+		addPopup.add(new JMenuItem(new AbstractAction("Group")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				plugin.getNotifications().add(new NotificationGroup(plugin));
+				plugin.updateConfig();
+				rebuild();
+			}
+		}));
 
 		JLabel addNotification = new JLabel(ADD_ICON);
 		addNotification.setToolTipText("Add a notification");
@@ -108,7 +115,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 		notificationView.add(new DropSpace(plugin, plugin, index++));
 		for (final Notification notif : plugin.getNotifications())
 		{
-			NotificationPanel panel = buildPanel(notif);
+			NotificationPanel<?> panel = NotificationPanel.buildPanel(plugin, notif);
 			if (panel != null)
 			{
 				notificationView.add(panel);
@@ -118,13 +125,5 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 
 		repaint();
 		revalidate();
-	}
-
-	private NotificationPanel buildPanel(Notification notif)
-	{
-		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, plugin);
-		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, plugin);
-
-		return null;
 	}
 }

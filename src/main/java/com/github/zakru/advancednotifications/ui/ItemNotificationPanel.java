@@ -1,23 +1,15 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.DraggableContainer;
 import com.github.zakru.advancednotifications.InventoryComparator;
 import com.github.zakru.advancednotifications.ItemNotification;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 
 public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 {
@@ -29,6 +21,9 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 		super(notification, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
+
+		DefaultTypePanel typePanel = new DefaultTypePanel(this, "Inventory");
+		typePanel.addDefaultVisualListener();
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -87,7 +82,7 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 		contentPanel.add(nameField, BorderLayout.NORTH);
 		contentPanel.add(paramsPanel, BorderLayout.SOUTH);
 
-		add(new DefaultTypePanel(this, "Inventory"), BorderLayout.NORTH);
+		add(typePanel, BorderLayout.NORTH);
 		add(contentPanel, BorderLayout.CENTER);
 	}
 

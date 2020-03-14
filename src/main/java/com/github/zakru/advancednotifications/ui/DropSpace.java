@@ -51,6 +51,7 @@ public class DropSpace extends JPanel
 
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setPreferredSize(new Dimension(0,10));
+		setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
 		addMouseListener(LISTENER);
 	}
