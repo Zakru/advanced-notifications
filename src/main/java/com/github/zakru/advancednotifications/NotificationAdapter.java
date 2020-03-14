@@ -1,6 +1,11 @@
 package com.github.zakru.advancednotifications;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.bind.ObjectTypeAdapter;
+import com.google.gson.internal.bind.TypeAdapters;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import net.runelite.api.ChatMessageType;
@@ -10,14 +15,15 @@ import java.io.IOException;
 public class NotificationAdapter extends TypeAdapter<Notification>
 {
 	private final AdvancedNotificationsPlugin plugin;
-	private final ItemNotificationAdapter itemNotificationAdapter;
-	private final EmptyNotificationAdapter emptyNotificationAdapter;
+	private final Gson gson;
 
 	public NotificationAdapter(AdvancedNotificationsPlugin plugin)
 	{
 		this.plugin = plugin;
-		this.itemNotificationAdapter = new ItemNotificationAdapter();
-		this.emptyNotificationAdapter = new EmptyNotificationAdapter();
+		gson = new GsonBuilder()
+			.registerTypeHierarchyAdapter(InventoryComparator.Pointer.class, new ComparatorAdapter())
+			.create();
+		System.out.println(gson.toJson(new InventoryComparator.Pointer(InventoryComparator.COUNT_DECREASED)));
 	}
 
 	@Override
@@ -25,7 +31,6 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		out.beginObject();
 		out.name("type").value(idOf(o));
-		out.name("enabled").value(o.isEnabled());
 		out.name("data"); outTyped(out, o);
 		out.endObject();
 	}
@@ -35,7 +40,6 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	{
 		int notificationType = -1;
 		Notification notification = null;
-		boolean enabled = true;
 
 		in.beginObject();
 		while (in.hasNext())
@@ -45,17 +49,16 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 				case "type":
 					notificationType = in.nextInt();
 					break;
-				case "enabled":
-					enabled = in.nextBoolean();
-					break;
 				case "data":
 					notification = ofType(in, notificationType);
 					break;
+				default:
+					in.skipValue();
 			}
 		}
 		in.endObject();
 
-		notification.setEnabled(enabled);
+		notification.setPlugin(plugin);
 		return notification;
 	}
 
@@ -64,9 +67,9 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		switch (type)
 		{
 			case 0:
-				return itemNotificationAdapter.read(plugin, in);
+				return gson.fromJson(in, ItemNotification.class);
 			case 1:
-				return emptyNotificationAdapter.read(plugin, in);
+				return gson.fromJson(in, EmptyNotification.class);
 			default:
 				return null;
 		}
@@ -74,8 +77,8 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 
 	private void outTyped(JsonWriter out, Notification o) throws IOException
 	{
-		if (o instanceof ItemNotification) itemNotificationAdapter.write(plugin, out, (ItemNotification)o);
-		else if (o instanceof EmptyNotification) emptyNotificationAdapter.write(plugin, out, (EmptyNotification)o);
+		if (o instanceof ItemNotification) gson.toJson(o, ItemNotification.class, out);
+		else if (o instanceof EmptyNotification) gson.toJson(o, EmptyNotification.class, out);
 	}
 
 	private int idOf(Notification o)

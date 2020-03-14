@@ -63,18 +63,18 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 		countLabel.setForeground(Color.WHITE);
 
 		JComboBox<InventoryComparator> comparatorBox = new JComboBox<>(InventoryComparator.COMPARATORS);
-		comparatorBox.setSelectedItem(notification.getComparator());
+		comparatorBox.setSelectedItem(notification.getComparator().object);
 		comparatorBox.setPreferredSize(new Dimension(50, 20));
 		comparatorBox.setMaximumRowCount(9);
 		comparatorBox.addItemListener(e -> {
-			notification.setComparator((InventoryComparator)comparatorBox.getSelectedItem());
+			notification.getComparator().object = (InventoryComparator)comparatorBox.getSelectedItem();
 			notification.getPlugin().updateConfig();
-			countSpinner.setVisible(notification.getComparator().takesParam());
+			countSpinner.setVisible(notification.getComparator().object.takesParam());
 		});
 
 		countSpinner.setValue(notification.getComparatorParam());
 		countSpinner.setPreferredSize(new Dimension(64, 20));
-		countSpinner.setVisible(notification.getComparator().takesParam());
+		countSpinner.setVisible(notification.getComparator().object.takesParam());
 		countSpinner.addChangeListener(e -> {
 			notification.setComparatorParam((Integer)countSpinner.getValue());
 			notification.getPlugin().updateConfig();

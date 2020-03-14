@@ -6,11 +6,12 @@ import lombok.Setter;
 public abstract class Notification
 {
 	@Getter
+	@Setter
 	private transient AdvancedNotificationsPlugin plugin;
 
 	@Getter
 	@Setter
-	private boolean enabled = true;
+	private  boolean enabled = true;
 
 	public Notification(AdvancedNotificationsPlugin plugin)
 	{

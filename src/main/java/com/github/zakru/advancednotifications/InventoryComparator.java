@@ -2,6 +2,15 @@ package com.github.zakru.advancednotifications;
 
 public interface InventoryComparator
 {
+	public static class Pointer
+	{
+		public InventoryComparator object;
+
+		public Pointer(InventoryComparator object)
+		{
+			this.object = object;
+		}
+	}
 
 	boolean shouldNotify(int previousCount, int newCount, int param);
 	boolean takesParam();
