@@ -104,13 +104,15 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 	{
 		notificationView.removeAll();
 
+		int index = 0;
+		notificationView.add(new DropSpace(plugin, plugin, index++));
 		for (final Notification notif : plugin.getNotifications())
 		{
 			NotificationPanel panel = buildPanel(notif);
 			if (panel != null)
 			{
 				notificationView.add(panel);
-				notificationView.add(Box.createRigidArea(new Dimension(0, 10)));
+				notificationView.add(new DropSpace(plugin, plugin, index++));
 			}
 		}
 
@@ -120,8 +122,8 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 
 	private NotificationPanel buildPanel(Notification notif)
 	{
-		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif);
-		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif);
+		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, plugin);
+		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, plugin);
 
 		return null;
 	}

@@ -1,9 +1,6 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
-import com.github.zakru.advancednotifications.EmptyNotification;
-import com.github.zakru.advancednotifications.InventoryComparator;
-import com.github.zakru.advancednotifications.ItemNotification;
+import com.github.zakru.advancednotifications.*;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -19,7 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class EmptyNotificationPanel extends NotificationPanel
+public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 {
 	private static final ImageIcon DELETE_ICON;
 	private static final ImageIcon DELETE_HOVER_ICON;
@@ -27,8 +24,6 @@ public class EmptyNotificationPanel extends NotificationPanel
 	private static final Border TYPE_BORDER = new CompoundBorder(
 		new MatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
 		new EmptyBorder(8, 8, 8, 8));
-
-	private EmptyNotification notification;
 
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner();
@@ -41,58 +36,18 @@ public class EmptyNotificationPanel extends NotificationPanel
 		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(addIcon, 0.53f));
 	}
 
-	public EmptyNotificationPanel(EmptyNotification notification)
+	public EmptyNotificationPanel(EmptyNotification notification, DraggableContainer container)
 	{
-		this.notification = notification;
+		super(notification, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-		JPanel typeWrapper = new JPanel(new BorderLayout());
-		typeWrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		typeWrapper.setBorder(TYPE_BORDER);
-
-		JLabel typeLabel = new JLabel("Empty Space");
-		typeLabel.setForeground(Color.WHITE);
-
-		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-		actions.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-
-		JLabel deleteButton = new JLabel(DELETE_ICON);
-		deleteButton.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mousePressed(MouseEvent e)
-			{
-				notification.getPlugin().getNotifications().remove(notification);
-				notification.getPlugin().updateConfig();
-				notification.getPlugin().rebuildPluginPanel();
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				deleteButton.setIcon(DELETE_HOVER_ICON);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				deleteButton.setIcon(DELETE_ICON);
-			}
-		});
-
-		actions.add(new EnabledButton(notification.getPlugin(), notification));
-		actions.add(deleteButton);
-
-		typeWrapper.add(typeLabel, BorderLayout.WEST);
-		typeWrapper.add(actions, BorderLayout.EAST);
-
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
-		contentPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		contentPanel.setOpaque(false);
 
 		JPanel paramsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		paramsPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		paramsPanel.setOpaque(false);
 
 		JLabel countLabel = new JLabel("Count ");
 		countLabel.setForeground(Color.WHITE);
@@ -121,7 +76,7 @@ public class EmptyNotificationPanel extends NotificationPanel
 
 		contentPanel.add(paramsPanel, BorderLayout.SOUTH);
 
-		add(typeWrapper, BorderLayout.NORTH);
+		add(new DefaultTypePanel(this, "Empty Space"), BorderLayout.NORTH);
 		add(contentPanel, BorderLayout.CENTER);
 	}
 }

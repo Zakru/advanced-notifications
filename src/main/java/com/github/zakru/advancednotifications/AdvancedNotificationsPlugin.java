@@ -1,6 +1,7 @@
 package com.github.zakru.advancednotifications;
 
 import com.github.zakru.advancednotifications.ui.AdvancedNotificationsPluginPanel;
+import com.github.zakru.advancednotifications.ui.DropSpace;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -8,6 +9,7 @@ import com.google.inject.Provides;
 import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -38,7 +40,7 @@ import java.util.Set;
 	tags = {"notifications", "inventory", "item"},
 	description = "An advanced notifications system"
 )
-public class AdvancedNotificationsPlugin extends Plugin
+public class AdvancedNotificationsPlugin extends Plugin implements DraggableContainer
 {
 	private static final String CONFIG_GROUP = "advancednotifications";
 	private static final String CONFIG_KEY = "notifications";
@@ -66,6 +68,14 @@ public class AdvancedNotificationsPlugin extends Plugin
 	private AdvancedNotificationsPluginPanel pluginPanel;
 	private NavigationButton navigationButton;
 	private Item[] previousItems;
+
+	@Getter
+	private Notification dragging;
+	@Getter
+	private DraggableContainer draggingFrom;
+	@Getter
+	@Setter
+	private DropSpace dragHovering;
 
 	@Getter
 	private List<Notification> notifications;
@@ -190,5 +200,11 @@ public class AdvancedNotificationsPlugin extends Plugin
 	public void rebuildPluginPanel()
 	{
 		pluginPanel.rebuild();
+	}
+
+	public void setDragging(Notification dragging, DraggableContainer from)
+	{
+		this.dragging = dragging;
+		draggingFrom = from;
 	}
 }
