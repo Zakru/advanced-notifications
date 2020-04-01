@@ -7,16 +7,14 @@ public class EmptyNotification extends Notification
 {
 	@Getter
 	@Setter
-	private InventoryComparator.Pointer comparator;
+	private InventoryComparator.Pointer comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
 	@Getter
 	@Setter
-	private int comparatorParam;
+	private int comparatorParam = 0;
 
 	public EmptyNotification(AdvancedNotificationsPlugin plugin)
 	{
 		super(plugin);
-		this.comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
-		this.comparatorParam = 0;
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -34,10 +33,10 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 		this.plugin = plugin;
 
 		setLayout(new BorderLayout());
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JPanel northPanel = new JPanel(new BorderLayout());
-		northPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
+		northPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
 		JLabel title = new JLabel("Notifications");
 		title.setForeground(Color.WHITE);
@@ -125,5 +124,10 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 
 		repaint();
 		revalidate();
+
+		for (Component n : notificationView.getComponents())
+		{
+			if (n instanceof NotificationGroupPanel) ((NotificationGroupPanel)n).resetScroll();
+		}
 	}
 }

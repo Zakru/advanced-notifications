@@ -6,9 +6,6 @@ import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -43,28 +40,46 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 			{
 				AdvancedNotificationsPlugin plugin = panel.plugin;
 				DropSpace space = plugin.getDragHovering();
+				Notification notif = panel.notification;
 
-				if (plugin.getDraggingFrom() != space.getContainer())
+				// Check if this is a container and the target is inside it
+				if (!(notif instanceof DraggableContainer
+					&& space.getContainer() instanceof Notification
+					&& (notif == space.getContainer()
+						|| containerContains((DraggableContainer)notif, (Notification)space.getContainer())))
+				)
 				{
-					plugin.getDraggingFrom().getNotifications().remove(plugin.getDragging());
-					space.getContainer().getNotifications().add(space.getIndex(), plugin.getDragging());
-				}
-				else
-				{
-					List<Notification> notifications = panel.container.getNotifications();
-					int originalIndex = notifications.indexOf(panel.notification);
-					notifications.remove(panel.notification);
-					int index = space.getIndex();
-					if (index > originalIndex) index = index - 1;
+					if (plugin.getDraggingFrom() != space.getContainer())
+					{
+						plugin.getDraggingFrom().getNotifications().remove(plugin.getDragging());
+						space.getContainer().getNotifications().add(space.getIndex(), plugin.getDragging());
+					}
+					else
+					{
+						List<Notification> notifications = panel.container.getNotifications();
+						int originalIndex = notifications.indexOf(panel.notification);
+						notifications.remove(panel.notification);
+						int index = space.getIndex();
+						if (index > originalIndex) index = index - 1;
 
-					notifications.add(index, panel.notification);
+						notifications.add(index, panel.notification);
+					}
+					plugin.updateConfig();
+					plugin.rebuildPluginPanel();
 				}
 
 				space.setBackground(ColorScheme.DARK_GRAY_COLOR);
 				plugin.setDragging(null, null);
-				plugin.updateConfig();
-				plugin.rebuildPluginPanel();
 			}
+		}
+
+		private static boolean containerContains(DraggableContainer parent, Notification child) {
+			if (parent.getNotifications().contains(child)) return true;
+
+			for (Notification n : parent.getNotifications())
+				if (n instanceof DraggableContainer && containerContains((DraggableContainer)n, child)) return true;
+
+			return false;
 		}
 	}
 
@@ -73,16 +88,16 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 		private static final ImageIcon DELETE_ICON;
 		private static final ImageIcon DELETE_HOVER_ICON;
 
-		private static final Border TYPE_BORDER = new CompoundBorder(
-			new MatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
-			new EmptyBorder(8, 8, 8, 8));
+		private static final Border TYPE_BORDER = BorderFactory.createCompoundBorder(
+			BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
+			BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
 		static
 		{
-			final BufferedImage addIcon
+			final BufferedImage deleteIcon
 				= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
-			DELETE_ICON = new ImageIcon(addIcon);
-			DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(addIcon, 0.53f));
+			DELETE_ICON = new ImageIcon(deleteIcon);
+			DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteIcon, 0.53f));
 		}
 
 		public DefaultTypePanel(NotificationPanel<?> panel, String typeName)
@@ -98,6 +113,7 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 
 			JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
 			actions.setOpaque(false);
+			actions.setBorder(BorderFactory.createEmptyBorder(0, -4, 0, -4));
 
 			JLabel deleteButton = new JLabel(DELETE_ICON);
 			deleteButton.addMouseListener(new MouseAdapter()
@@ -105,7 +121,7 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 				@Override
 				public void mousePressed(MouseEvent e)
 				{
-					panel.notification.getPlugin().getNotifications().remove(panel.notification);
+					panel.container.getNotifications().remove(panel.notification);
 					panel.notification.getPlugin().updateConfig();
 					panel.notification.getPlugin().rebuildPluginPanel();
 				}
@@ -162,11 +178,11 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel
 		plugin = notification.getPlugin();
 	}
 
-	public static NotificationPanel buildPanel(AdvancedNotificationsPlugin plugin, Notification notif)
+	public static NotificationPanel<?> buildPanel(DraggableContainer container, Notification notif)
 	{
-		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, plugin);
-		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, plugin);
-		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, plugin);
+		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, container);
+		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, container);
+		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, container);
 
 		return null;
 	}

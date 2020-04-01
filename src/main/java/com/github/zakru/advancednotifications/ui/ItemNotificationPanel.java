@@ -6,7 +6,6 @@ import com.github.zakru.advancednotifications.ItemNotification;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -26,7 +25,7 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 		typePanel.addDefaultVisualListener();
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
+		contentPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		contentPanel.setOpaque(false);
 
 		JTextField nameField = new JTextField(notification.getItem());

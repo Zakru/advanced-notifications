@@ -10,20 +10,17 @@ public class ItemNotification extends Notification
 {
 	@Getter
 	@Setter
-	private String item;
+	private String item = "Coins";
 	@Getter
 	@Setter
-	private InventoryComparator.Pointer comparator;
+	private InventoryComparator.Pointer comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
 	@Getter
 	@Setter
-	private int comparatorParam;
+	private int comparatorParam = 0;
 
 	public ItemNotification(AdvancedNotificationsPlugin plugin)
 	{
 		super(plugin);
-		item = "Coins";
-		comparator = new InventoryComparator.Pointer(InventoryComparator.COMPARATORS[0]);
-		comparatorParam = 0;
 	}
 
 	@Override

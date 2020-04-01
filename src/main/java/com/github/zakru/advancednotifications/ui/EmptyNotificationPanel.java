@@ -6,7 +6,6 @@ import com.github.zakru.advancednotifications.InventoryComparator;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
@@ -24,7 +23,7 @@ public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 		typePanel.addDefaultVisualListener();
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
+		contentPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		contentPanel.setOpaque(false);
 
 		JPanel paramsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
