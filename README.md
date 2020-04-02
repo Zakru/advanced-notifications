@@ -2,7 +2,7 @@
 
 An advanced notifications system for RuneLite
 
-Allows users to set up many kinds (currently two) of notifications which
+Allows users to set up many kinds of notifications which
 cause the generic notification as defined in the RuneLite config (just
 like, for example, the idle notifier).
 
