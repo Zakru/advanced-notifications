@@ -33,3 +33,14 @@ fulfilling the condition:
 
 Same as *Inventory*, but when the amount of empty space in your
 inventory changes.
+
+### Group
+
+A group of notifications that can be turned on or off at once. Can also
+be renamed. Add notifications by dragging them into it.
+
+## Reordering
+
+You can drag notifications by their title to reorder and organize them.
+
+![Example](https://i.imgur.com/hgwMLUS.gif)
