@@ -202,7 +202,10 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 			JPanel notificationView = new JPanel();
 			notificationView.setLayout(new BoxLayout(notificationView, BoxLayout.Y_AXIS));
 			notificationView.setOpaque(false);
-			notificationView.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+			notificationView.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createMatteBorder(0, 5, 0, 0, ColorScheme.DARKER_GRAY_COLOR),
+				BorderFactory.createEmptyBorder(0, 5, 0, 0))
+			);
 
 			int index = 0;
 			notificationView.add(new DropSpace(plugin, notification, index++));
