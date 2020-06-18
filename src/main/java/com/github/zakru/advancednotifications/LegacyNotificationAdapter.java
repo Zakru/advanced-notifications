@@ -1,17 +1,19 @@
 package com.github.zakru.advancednotifications;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 
-public class NotificationAdapter extends TypeAdapter<Notification>
+public class LegacyNotificationAdapter extends TypeAdapter<Notification>
 {
 	private final AdvancedNotificationsPlugin plugin;
 	private final Gson gson;
 
-	public NotificationAdapter(AdvancedNotificationsPlugin plugin)
+	public LegacyNotificationAdapter(AdvancedNotificationsPlugin plugin)
 	{
 		this.plugin = plugin;
 		gson = new GsonBuilder()
@@ -23,25 +25,40 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 	@Override
 	public void write(JsonWriter out, Notification o) throws IOException
 	{
-		JsonObject jo = outTyped(out, o).getAsJsonObject();
-		jo.addProperty("type", idOf(o));
-		gson.toJson(jo, out);
+		out.beginObject();
+		out.name("type").value(idOf(o));
+		out.name("data"); outTyped(out, o);
+		out.endObject();
 	}
 
 	@Override
 	public Notification read(JsonReader in) throws IOException
 	{
-		JsonObject jo = gson.fromJson(in, JsonObject.class);
-		int notificationType = jo.get("type").getAsInt();
-		jo.remove("type");
+		int notificationType = -1;
+		Notification notification = null;
 
-		Notification notification = ofType(jo, notificationType);
+		in.beginObject();
+		while (in.hasNext())
+		{
+			switch (in.nextName())
+			{
+				case "type":
+					notificationType = in.nextInt();
+					break;
+				case "data":
+					notification = ofType(in, notificationType);
+					break;
+				default:
+					in.skipValue();
+			}
+		}
+		in.endObject();
 
 		notification.setPlugin(plugin);
 		return notification;
 	}
 
-	private Notification ofType(JsonElement in, int type) throws IOException
+	private Notification ofType(JsonReader in, int type) throws IOException
 	{
 		switch (type)
 		{
@@ -56,12 +73,11 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		}
 	}
 
-	private JsonElement outTyped(JsonWriter out, Notification o) throws IOException
+	private void outTyped(JsonWriter out, Notification o) throws IOException
 	{
-		if (o instanceof ItemNotification) return gson.toJsonTree(o, ItemNotification.class);
-		else if (o instanceof EmptyNotification) return gson.toJsonTree(o, EmptyNotification.class);
-		else if (o instanceof NotificationGroup) return gson.toJsonTree(o, NotificationGroup.class);
-		throw new RuntimeException("Unexpected notification type " + o.getClass());
+		if (o instanceof ItemNotification) gson.toJson(o, ItemNotification.class, out);
+		else if (o instanceof EmptyNotification) gson.toJson(o, EmptyNotification.class, out);
+		else if (o instanceof NotificationGroup) gson.toJson(o, NotificationGroup.class, out);
 	}
 
 	private int idOf(Notification o)

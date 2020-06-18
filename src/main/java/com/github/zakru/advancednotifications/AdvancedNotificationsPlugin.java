@@ -41,8 +41,11 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 {
 	private static final String CONFIG_GROUP = "advancednotifications";
 	private static final String CONFIG_KEY = "notifications";
+	private static final String CONFIG_KEY_FORMAT = "format";
 	private static final String ICON_FILE = "panel_icon.png";
 	private static final String PLUGIN_NAME = "Advanced Notifications";
+
+	private static final int FORMAT_CURRENT_VERSION = 1;
 
 	@Inject
 	@Getter(AccessLevel.PACKAGE)
@@ -74,7 +77,14 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 		notifications = new ArrayList<>();
 		previousItems = null;
 
-		loadConfig(configManager.getConfiguration(CONFIG_GROUP, CONFIG_KEY));
+		int version = 0;
+		String versionString = configManager.getConfiguration(CONFIG_GROUP, CONFIG_KEY_FORMAT);
+		try
+		{
+			if (!Strings.isNullOrEmpty(versionString)) version = Integer.parseInt(versionString);
+		}
+		catch (NumberFormatException e) {}
+		loadConfig(configManager.getConfiguration(CONFIG_GROUP, CONFIG_KEY), version);
 
 		pluginPanel = new AdvancedNotificationsPluginPanel(this);
 		pluginPanel.rebuild();
@@ -106,11 +116,11 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 	{
 		if (notifications.isEmpty() && event.getGroup().equals(CONFIG_GROUP) && event.getKey().equals(CONFIG_KEY))
 		{
-			loadConfig(event.getNewValue());
+			loadConfig(event.getNewValue(), FORMAT_CURRENT_VERSION);
 		}
 	}
 
-	private void loadConfig(String json)
+	private void loadConfig(String json, int version)
 	{
 		if (Strings.isNullOrEmpty(json))
 		{
@@ -118,11 +128,22 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 			return;
 		}
 
-		Gson gson = new GsonBuilder()
-			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
-			.create();
+		if (version == 0)
+		{
+			Gson gson = new GsonBuilder()
+				.registerTypeAdapter(Notification.class, new LegacyNotificationAdapter(this))
+				.create();
 
-		notifications = gson.fromJson(json, new TypeToken<ArrayList<Notification>>(){}.getType());
+			notifications = gson.fromJson(json, new TypeToken<ArrayList<Notification>>(){}.getType());
+		}
+		else if (version == 1)
+		{
+			Gson gson = new GsonBuilder()
+				.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
+				.create();
+
+			notifications = gson.fromJson(json, new TypeToken<ArrayList<Notification>>(){}.getType());
+		}
 	}
 
 	private void notify(Object event)
@@ -177,15 +198,18 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 	{
 		if (notifications.isEmpty())
 		{
+			configManager.unsetConfiguration(CONFIG_GROUP, CONFIG_KEY_FORMAT);
 			configManager.unsetConfiguration(CONFIG_GROUP, CONFIG_KEY);
 			return;
 		}
 
+		configManager.unsetConfiguration(CONFIG_GROUP, CONFIG_KEY_FORMAT);
 		final Gson gson = new GsonBuilder()
 			.registerTypeAdapter(Notification.class, new NotificationAdapter(this))
 			.create();
 		final String json = gson.toJson(notifications, new TypeToken<ArrayList<Notification>>(){}.getType());
 		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY, json);
+		configManager.setConfiguration(CONFIG_GROUP, CONFIG_KEY_FORMAT, FORMAT_CURRENT_VERSION);
 	}
 
 	public void rebuildPluginPanel()
