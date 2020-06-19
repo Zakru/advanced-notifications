@@ -1,5 +1,6 @@
-package com.github.zakru.advancednotifications;
+package com.github.zakru.advancednotifications.notification;
 
+import com.github.zakru.advancednotifications.notification.InventoryComparator;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;

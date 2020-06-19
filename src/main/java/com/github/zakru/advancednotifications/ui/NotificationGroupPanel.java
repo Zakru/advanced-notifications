@@ -18,8 +18,8 @@ import javax.swing.JTextField;
 
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.DraggableContainer;
-import com.github.zakru.advancednotifications.Notification;
-import com.github.zakru.advancednotifications.NotificationGroup;
+import com.github.zakru.advancednotifications.notification.Notification;
+import com.github.zakru.advancednotifications.notification.NotificationGroup;
 
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;

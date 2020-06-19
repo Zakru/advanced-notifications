@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.github.zakru.advancednotifications.notification.*;
 import com.github.zakru.advancednotifications.ui.AdvancedNotificationsPluginPanel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -48,15 +49,15 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 	private static final int FORMAT_CURRENT_VERSION = 1;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
+	@Getter
 	private Client client;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
+	@Getter
 	private ItemManager itemManager;
 
 	@Inject
-	@Getter(AccessLevel.PACKAGE)
+	@Getter
 	private Notifier notifier;
 
 	@Inject
@@ -71,6 +72,10 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 
 	private List<Notification> notifications;
 
+	static {
+		NotificationTypes.registerAll();
+	}
+
 	@Override
 	protected void startUp() throws Exception
 	{
@@ -83,7 +88,7 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 		{
 			if (!Strings.isNullOrEmpty(versionString)) version = Integer.parseInt(versionString);
 		}
-		catch (NumberFormatException e) {}
+		catch (NumberFormatException ignored) {}
 		loadConfig(configManager.getConfiguration(CONFIG_GROUP, CONFIG_KEY), version);
 
 		pluginPanel = new AdvancedNotificationsPluginPanel(this);

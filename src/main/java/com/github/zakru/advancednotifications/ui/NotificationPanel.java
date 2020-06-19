@@ -1,6 +1,10 @@
 package com.github.zakru.advancednotifications.ui;
 
 import com.github.zakru.advancednotifications.*;
+import com.github.zakru.advancednotifications.notification.EmptyNotification;
+import com.github.zakru.advancednotifications.notification.ItemNotification;
+import com.github.zakru.advancednotifications.notification.Notification;
+import com.github.zakru.advancednotifications.notification.NotificationGroup;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 

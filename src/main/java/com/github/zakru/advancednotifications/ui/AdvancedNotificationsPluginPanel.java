@@ -37,7 +37,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 	private final AdvancedNotificationsPlugin plugin;
 
 	private final JPanel notificationView;
-	
+
 	@Getter
 	private Notification dragging;
 	@Getter

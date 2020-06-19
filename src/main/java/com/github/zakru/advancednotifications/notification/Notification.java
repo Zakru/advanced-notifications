@@ -1,7 +1,12 @@
-package com.github.zakru.advancednotifications;
+package com.github.zakru.advancednotifications.notification;
 
+import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
+import com.github.zakru.advancednotifications.condition.Condition;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Notification implements Cloneable
 {
@@ -13,14 +18,17 @@ public abstract class Notification implements Cloneable
 	@Setter
 	private  boolean enabled = true;
 
+	//@Getter
+	//private List<Condition> conditions = new ArrayList<>();
+
 	public Notification(AdvancedNotificationsPlugin plugin)
 	{
 		this.plugin = plugin;
 	}
 
-	void tryNotify(Object event)
+	public void tryNotify(Object event)
 	{
-		if (!enabled) return;
+		if (!enabled) return;// || conditions.stream().anyMatch(c -> !c.isFulfilled())) return;
 
 		notify(event);
 	}

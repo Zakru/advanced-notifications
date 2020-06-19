@@ -17,9 +17,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.github.zakru.advancednotifications.DraggableContainer;
-import com.github.zakru.advancednotifications.InventoryComparator;
-import com.github.zakru.advancednotifications.ItemNotification;
-import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.notification.InventoryComparator;
+import com.github.zakru.advancednotifications.notification.ItemNotification;
+import com.github.zakru.advancednotifications.notification.Notification;
 
 import net.runelite.client.ui.ColorScheme;
 

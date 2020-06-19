@@ -1,5 +1,7 @@
-package com.github.zakru.advancednotifications;
+package com.github.zakru.advancednotifications.notification;
 
+import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
+import com.github.zakru.advancednotifications.DraggableContainer;
 import lombok.Getter;
 import lombok.Setter;
 

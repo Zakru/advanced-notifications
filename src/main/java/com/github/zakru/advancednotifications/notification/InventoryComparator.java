@@ -1,4 +1,4 @@
-package com.github.zakru.advancednotifications;
+package com.github.zakru.advancednotifications.notification;
 
 public interface InventoryComparator
 {

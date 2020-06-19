@@ -1,7 +1,7 @@
 package com.github.zakru.advancednotifications.ui;
 
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
-import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.notification.Notification;
 import net.runelite.client.util.ImageUtil;
 
 import javax.swing.*;

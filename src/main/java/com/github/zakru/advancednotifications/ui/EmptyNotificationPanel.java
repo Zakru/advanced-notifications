@@ -1,9 +1,9 @@
 package com.github.zakru.advancednotifications.ui;
 
 import com.github.zakru.advancednotifications.DraggableContainer;
-import com.github.zakru.advancednotifications.EmptyNotification;
-import com.github.zakru.advancednotifications.InventoryComparator;
-import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.notification.EmptyNotification;
+import com.github.zakru.advancednotifications.notification.InventoryComparator;
+import com.github.zakru.advancednotifications.notification.Notification;
 
 import net.runelite.client.ui.ColorScheme;
 

@@ -1,5 +1,6 @@
-package com.github.zakru.advancednotifications;
+package com.github.zakru.advancednotifications.notification;
 
+import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
