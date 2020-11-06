@@ -1,21 +1,30 @@
 package com.github.zakru.advancednotifications;
 
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import com.github.zakru.advancednotifications.ui.AdvancedNotificationsPluginPanel;
 import com.github.zakru.advancednotifications.ui.DropSpace;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.google.inject.Provides;
+
 import joptsimple.internal.Strings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -26,13 +35,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
-
-import javax.inject.Inject;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @PluginDescriptor(
@@ -157,13 +159,15 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 				return;
 			}
 
-			Set<Integer> uniqueItems = new HashSet<>();
-			addUniqueItems(uniqueItems, items);
-			addUniqueItems(uniqueItems, previousItems);
+			if (client.getWidget(WidgetInfo.BANK_CONTAINER) == null) {
+				Set<Integer> uniqueItems = new HashSet<>();
+				addUniqueItems(uniqueItems, items);
+				addUniqueItems(uniqueItems, previousItems);
 
-			for (int id : uniqueItems)
-			{
-				notify(new InventoryEvent(id, countItems(items, id), countItems(previousItems, id)));
+				for (int id : uniqueItems)
+				{
+					notify(new InventoryEvent(id, countItems(items, id), countItems(previousItems, id)));
+				}
 			}
 
 			previousItems = items;
