@@ -2,9 +2,6 @@ package com.github.zakru.advancednotifications;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.ChatMessageType;
-
-import java.util.Arrays;
 
 public class ItemNotification extends Notification
 {
@@ -35,5 +32,15 @@ public class ItemNotification extends Notification
 		{
 			doNotification(comparator.object.notification(item, comparatorParam));
 		}
+	}
+
+	@Override
+	public ItemNotification clone()
+	{
+		ItemNotification n = new ItemNotification(getPlugin());
+		n.item = item;
+		n.comparator = new InventoryComparator.Pointer(comparator.object);
+		n.comparatorParam = comparatorParam;
+		return n;
 	}
 }

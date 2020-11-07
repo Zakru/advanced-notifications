@@ -3,7 +3,7 @@ package com.github.zakru.advancednotifications;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class Notification
+public abstract class Notification implements Cloneable
 {
 	@Getter
 	@Setter
@@ -31,4 +31,6 @@ public abstract class Notification
 	{
 		plugin.getNotifier().notify(message);
 	}
+
+	public abstract Notification clone();
 }

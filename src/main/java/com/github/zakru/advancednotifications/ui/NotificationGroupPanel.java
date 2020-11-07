@@ -63,18 +63,25 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		northPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		northPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		northPanel.addMouseListener(new DragStarter(this));
+		northPanel.addMouseListener(this);
 		northPanel.addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
-				northPanel.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					northPanel.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
-				northPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					northPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+				}
 			}
 		});
 
@@ -118,12 +125,15 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		rename.addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				nameLabel.setEnabled(true);
-				nameLabel.requestFocusInWindow();
-				nameLabel.selectAll();
-				rename.setEnabled(false);
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					nameLabel.setEnabled(true);
+					nameLabel.requestFocusInWindow();
+					nameLabel.selectAll();
+					rename.setEnabled(false);
+				}
 			}
 
 			@Override
@@ -143,11 +153,14 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		deleteButton.addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				container.getNotifications().remove(notification);
-				notification.getPlugin().updateConfig();
-				notification.getPlugin().rebuildPluginPanel();
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					container.getNotifications().remove(notification);
+					notification.getPlugin().updateConfig();
+					notification.getPlugin().rebuildPluginPanel();
+				}
 			}
 
 			@Override
@@ -171,11 +184,14 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		collapseOrExpand.addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				notification.setCollapsed(!notification.isCollapsed());
-				notification.getPlugin().updateConfig();
-				notification.getPlugin().rebuildPluginPanel();
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					notification.setCollapsed(!notification.isCollapsed());
+					notification.getPlugin().updateConfig();
+					notification.getPlugin().rebuildPluginPanel();
+				}
 			}
 
 			@Override

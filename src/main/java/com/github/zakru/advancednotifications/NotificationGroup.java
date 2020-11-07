@@ -27,4 +27,15 @@ public class NotificationGroup extends Notification implements DraggableContaine
 	{
 		for (Notification n : notifications) n.tryNotify(event);
 	}
+
+	@Override
+	public NotificationGroup clone() {
+		NotificationGroup n = new NotificationGroup(getPlugin());
+		n.name = name + " copy";
+		n.collapsed = collapsed;
+
+		for (Notification n1 : notifications) n.notifications.add(n1.clone());
+
+		return n;
+	}
 }

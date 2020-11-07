@@ -23,7 +23,6 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
@@ -159,7 +158,8 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 				return;
 			}
 
-			if (client.getWidget(WidgetInfo.BANK_CONTAINER) == null) {
+			if (client.getWidget(WidgetInfo.BANK_CONTAINER) == null)
+			{
 				Set<Integer> uniqueItems = new HashSet<>();
 				addUniqueItems(uniqueItems, items);
 				addUniqueItems(uniqueItems, previousItems);

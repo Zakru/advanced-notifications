@@ -42,11 +42,14 @@ public class EnabledButton extends JLabel
 		addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				notification.setEnabled(!notification.isEnabled());
-				updateIcon();
-				plugin.updateConfig();
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					notification.setEnabled(!notification.isEnabled());
+					updateIcon();
+					plugin.updateConfig();
+				}
 			}
 
 			@Override

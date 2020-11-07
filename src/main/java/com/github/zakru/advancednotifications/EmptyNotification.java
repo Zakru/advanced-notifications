@@ -29,4 +29,13 @@ public class EmptyNotification extends Notification
 			doNotification(comparator.object.notification("empty space", comparatorParam));
 		}
 	}
+
+	@Override
+	public EmptyNotification clone()
+	{
+		EmptyNotification n = new EmptyNotification(getPlugin());
+		n.comparator = new InventoryComparator.Pointer(comparator.object);
+		n.comparatorParam = comparatorParam;
+		return n;
+	}
 }
