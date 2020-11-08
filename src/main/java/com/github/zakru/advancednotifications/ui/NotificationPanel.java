@@ -16,6 +16,17 @@ import java.util.List;
 
 public abstract class NotificationPanel<N extends Notification> extends JPanel implements MouseListener
 {
+	private static final ImageIcon DELETE_ICON;
+	private static final ImageIcon DELETE_HOVER_ICON;
+
+	static
+	{
+		final BufferedImage deleteIcon
+			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
+		DELETE_ICON = new ImageIcon(deleteIcon);
+		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteIcon, 0.53f));
+	}
+
 	protected static class DragStarter extends MouseAdapter
 	{
 		private final NotificationPanel<?> panel;
@@ -94,20 +105,9 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 
 	protected static class DefaultTypePanel extends JPanel
 	{
-		private static final ImageIcon DELETE_ICON;
-		private static final ImageIcon DELETE_HOVER_ICON;
-
 		private static final Border TYPE_BORDER = BorderFactory.createCompoundBorder(
 			BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
 			BorderFactory.createEmptyBorder(8, 8, 8, 8));
-
-		static
-		{
-			final BufferedImage deleteIcon
-				= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
-			DELETE_ICON = new ImageIcon(deleteIcon);
-			DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteIcon, 0.53f));
-		}
 
 		public DefaultTypePanel(NotificationPanel<?> panel, String typeName)
 		{
@@ -121,42 +121,8 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			JLabel typeLabel = new JLabel(typeName);
 			typeLabel.setForeground(Color.WHITE);
 
-			JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-			actions.setOpaque(false);
-			actions.setBorder(BorderFactory.createEmptyBorder(0, -4, 0, -4));
-
-			JLabel deleteButton = new JLabel(DELETE_ICON);
-			deleteButton.addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mouseClicked(MouseEvent e)
-				{
-					if (e.getButton() == MouseEvent.BUTTON1)
-					{
-						panel.container.getNotifications().remove(panel.notification);
-						panel.notification.getPlugin().updateConfig();
-						panel.notification.getPlugin().rebuildPluginPanel();
-					}
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e)
-				{
-					deleteButton.setIcon(DELETE_HOVER_ICON);
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e)
-				{
-					deleteButton.setIcon(DELETE_ICON);
-				}
-			});
-
-			actions.add(new EnabledButton(panel.notification.getPlugin(), panel.notification));
-			actions.add(deleteButton);
-
 			add(typeLabel, BorderLayout.WEST);
-			add(actions, BorderLayout.EAST);
+			add(createDefaultActions(panel), BorderLayout.EAST);
 		}
 
 		public void addDefaultVisualListener()
@@ -249,5 +215,43 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			menuPopup.show(this, e.getX(), e.getY());
 			e.consume();
 		}
+	}
+	
+	protected static JPanel createDefaultActions(NotificationPanel<?> panel) {
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+		actions.setOpaque(false);
+		actions.setBorder(BorderFactory.createEmptyBorder(0, -4, 0, -4));
+
+		JLabel deleteButton = new JLabel(DELETE_ICON);
+		deleteButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getButton() == MouseEvent.BUTTON1)
+				{
+					panel.container.getNotifications().remove(panel.notification);
+					panel.notification.getPlugin().updateConfig();
+					panel.notification.getPlugin().rebuildPluginPanel();
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				deleteButton.setIcon(DELETE_HOVER_ICON);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				deleteButton.setIcon(DELETE_ICON);
+			}
+		});
+
+		actions.add(new EnabledButton(panel.notification.getPlugin(), panel.notification));
+		actions.add(deleteButton);
+		
+		return actions;
 	}
 }

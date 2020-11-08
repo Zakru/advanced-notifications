@@ -1,24 +1,31 @@
 package com.github.zakru.advancednotifications.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.DraggableContainer;
 import com.github.zakru.advancednotifications.Notification;
 import com.github.zakru.advancednotifications.NotificationGroup;
+
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-
 public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 {
-	private static final ImageIcon DELETE_ICON;
-	private static final ImageIcon DELETE_HOVER_ICON;
-
 	private static final ImageIcon RENAME_ICON;
 	private static final ImageIcon RENAME_HOVER_ICON;
 
@@ -32,11 +39,6 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 
 	static
 	{
-		final BufferedImage deleteIcon
-			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
-		DELETE_ICON = new ImageIcon(deleteIcon);
-		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteIcon, 0.53f));
-
 		final BufferedImage renameIcon
 			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "rename_icon.png");
 		RENAME_ICON = new ImageIcon(renameIcon);
@@ -117,9 +119,7 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 			}
 		});
 
-		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-		actions.setOpaque(false);
-		actions.setBorder(BorderFactory.createEmptyBorder(0, -4, 0, -4));
+		JPanel actions = createDefaultActions(this);
 
 		rename = new JLabel(RENAME_ICON);
 		rename.addMouseListener(new MouseAdapter()
@@ -149,36 +149,7 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 			}
 		});
 
-		JLabel deleteButton = new JLabel(DELETE_ICON);
-		deleteButton.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				if (e.getButton() == MouseEvent.BUTTON1)
-				{
-					container.getNotifications().remove(notification);
-					notification.getPlugin().updateConfig();
-					notification.getPlugin().rebuildPluginPanel();
-				}
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				deleteButton.setIcon(DELETE_HOVER_ICON);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				deleteButton.setIcon(DELETE_ICON);
-			}
-		});
-
-		actions.add(rename);
-		actions.add(new EnabledButton(notification.getPlugin(), notification));
-		actions.add(deleteButton);
+		actions.add(rename, 0);
 
 		JLabel collapseOrExpand = new JLabel(notification.isCollapsed() ? EXPAND_ICON : COLLAPSE_ICON);
 		collapseOrExpand.addMouseListener(new MouseAdapter()
