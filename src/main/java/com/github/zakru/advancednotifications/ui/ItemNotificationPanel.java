@@ -1,23 +1,36 @@
 package com.github.zakru.advancednotifications.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import com.github.zakru.advancednotifications.DraggableContainer;
 import com.github.zakru.advancednotifications.InventoryComparator;
 import com.github.zakru.advancednotifications.ItemNotification;
-import net.runelite.client.ui.ColorScheme;
+import com.github.zakru.advancednotifications.Notification;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
+import net.runelite.client.ui.ColorScheme;
 
 public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 {
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner(spinnerModel);
 
-	public ItemNotificationPanel(ItemNotification notification, DraggableContainer container)
+	public ItemNotificationPanel(ItemNotification notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
 	{
-		super(notification, container);
+		super(notification, system, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
 

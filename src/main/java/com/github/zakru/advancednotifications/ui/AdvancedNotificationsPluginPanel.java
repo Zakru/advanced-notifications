@@ -1,17 +1,35 @@
 package com.github.zakru.advancednotifications.ui;
 
-import com.github.zakru.advancednotifications.*;
-import net.runelite.client.ui.PluginPanel;
-import net.runelite.client.util.ImageUtil;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class AdvancedNotificationsPluginPanel extends PluginPanel
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+
+import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
+import com.github.zakru.advancednotifications.DraggableContainer;
+import com.github.zakru.advancednotifications.EmptyNotification;
+import com.github.zakru.advancednotifications.ItemNotification;
+import com.github.zakru.advancednotifications.Notification;
+import com.github.zakru.advancednotifications.NotificationGroup;
+
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.util.ImageUtil;
+
+public class AdvancedNotificationsPluginPanel extends PluginPanel implements DropSpaceSystem<Notification>
 {
 	private static final ImageIcon ADD_ICON;
 	private static final ImageIcon ADD_HOVER_ICON;
@@ -19,6 +37,14 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 	private final AdvancedNotificationsPlugin plugin;
 
 	private final JPanel notificationView;
+	
+	@Getter
+	private Notification dragging;
+	@Getter
+	private DraggableContainer<Notification> draggingFrom;
+	@Getter
+	@Setter
+	private DropSpace<Notification> dragHovering;
 
 	static
 	{
@@ -47,7 +73,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getNotifications().add(new ItemNotification(plugin));
+				plugin.getItems().add(new ItemNotification(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -57,7 +83,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getNotifications().add(new EmptyNotification(plugin));
+				plugin.getItems().add(new EmptyNotification(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -67,7 +93,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getNotifications().add(new NotificationGroup(plugin));
+				plugin.getItems().add(new NotificationGroup(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -111,14 +137,14 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 		notificationView.removeAll();
 
 		int index = 0;
-		notificationView.add(new DropSpace(plugin, plugin, index++));
-		for (final Notification notif : plugin.getNotifications())
+		notificationView.add(new DropSpace<Notification>(this, plugin, index++));
+		for (final Notification notif : plugin.getItems())
 		{
-			NotificationPanel<?> panel = NotificationPanel.buildPanel(plugin, notif);
+			NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, this, plugin);
 			if (panel != null)
 			{
 				notificationView.add(panel);
-				notificationView.add(new DropSpace(plugin, plugin, index++));
+				notificationView.add(new DropSpace<Notification>(this, plugin, index++));
 			}
 		}
 
@@ -129,5 +155,11 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel
 		{
 			if (n instanceof NotificationGroupPanel) ((NotificationGroupPanel)n).resetScroll();
 		}
+	}
+
+	@Override
+	public void setDragging(Notification n, DraggableContainer<Notification> from) {
+		dragging = n;
+		draggingFrom = from;
 	}
 }

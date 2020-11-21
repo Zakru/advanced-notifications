@@ -2,7 +2,7 @@ package com.github.zakru.advancednotifications;
 
 import java.util.List;
 
-public interface DraggableContainer
+public interface DraggableContainer<T>
 {
-	List<Notification> getNotifications();
+	List<T> getItems();
 }

@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotificationGroup extends Notification implements DraggableContainer
+public class NotificationGroup extends Notification implements DraggableContainer<Notification>
 {
 	@Getter
 	@Setter
@@ -14,7 +14,6 @@ public class NotificationGroup extends Notification implements DraggableContaine
 	@Getter
 	@Setter
 	private boolean collapsed = false;
-	@Getter
 	private final List<Notification> notifications = new ArrayList<>();
 
 	public NotificationGroup(AdvancedNotificationsPlugin plugin)
@@ -37,5 +36,10 @@ public class NotificationGroup extends Notification implements DraggableContaine
 		for (Notification n1 : notifications) n.notifications.add(n1.clone());
 
 		return n;
+	}
+
+	@Override
+	public List<Notification> getItems() {
+		return notifications;
 	}
 }

@@ -55,9 +55,9 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		EXPAND_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(expandIcon, 0.53f));
 	}
 
-	public NotificationGroupPanel(NotificationGroup notification, DraggableContainer container)
+	public NotificationGroupPanel(NotificationGroup notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
 	{
-		super(notification, container);
+		super(notification, system, container);
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
@@ -195,14 +195,14 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 			);
 
 			int index = 0;
-			notificationView.add(new DropSpace(plugin, notification, index++));
-			for (final Notification notif : notification.getNotifications())
+			notificationView.add(new DropSpace<Notification>(system, notification, index++));
+			for (final Notification notif : notification.getItems())
 			{
-				NotificationPanel<?> panel = NotificationPanel.buildPanel(notification, notif);
+				NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, system, notification);
 				if (panel != null)
 				{
 					notificationView.add(panel);
-					notificationView.add(new DropSpace(plugin, notification, index++));
+					notificationView.add(new DropSpace<Notification>(system, notification, index++));
 				}
 			}
 

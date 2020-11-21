@@ -41,40 +41,41 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 		{
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
-				panel.plugin.setDragging(panel.notification, panel.container);
+				panel.system.setDragging(panel.notification, panel.container);
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
-				if (panel.plugin.getDragHovering() == null)
+				if (panel.system.getDragHovering() == null)
 				{
-					panel.plugin.setDragging(null, null);
+					panel.system.setDragging(null, null);
 				}
 				else
 				{
-					AdvancedNotificationsPlugin plugin = panel.plugin;
-					DropSpace space = plugin.getDragHovering();
+					DropSpaceSystem<Notification> system = panel.system;
+					DropSpace<Notification> space = system.getDragHovering();
 					Notification notif = panel.notification;
 
 					// Check if this is a container and the target is inside it
 					if (!(notif instanceof DraggableContainer
 						&& space.getContainer() instanceof Notification
 						&& (notif == space.getContainer()
-							|| containerContains((DraggableContainer)notif, (Notification)space.getContainer())))
+							|| containerContains((DraggableContainer<Notification>)notif, (Notification)space.getContainer())))
 					)
 					{
-						if (plugin.getDraggingFrom() != space.getContainer())
+						if (system.getDraggingFrom() != space.getContainer())
 						{
-							plugin.getDraggingFrom().getNotifications().remove(plugin.getDragging());
-							space.getContainer().getNotifications().add(space.getIndex(), plugin.getDragging());
+							system.getDraggingFrom().getItems().remove(system.getDragging());
+							space.getContainer().getItems().add(space.getIndex(), system.getDragging());
 						}
 						else
 						{
-							List<Notification> notifications = panel.container.getNotifications();
+							List<Notification> notifications = panel.container.getItems();
 							int originalIndex = notifications.indexOf(panel.notification);
 							notifications.remove(panel.notification);
 							int index = space.getIndex();
@@ -82,22 +83,23 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 
 							notifications.add(index, panel.notification);
 						}
-						plugin.updateConfig();
-						plugin.rebuildPluginPanel();
+						panel.plugin.updateConfig();
+						panel.plugin.rebuildPluginPanel();
 					}
 
 					space.setBackground(ColorScheme.DARK_GRAY_COLOR);
-					plugin.setDragging(null, null);
-					plugin.setDragHovering(null);
+					system.setDragging(null, null);
+					system.setDragHovering(null);
 				}
 			}
 		}
 
-		private static boolean containerContains(DraggableContainer parent, Notification child) {
-			if (parent.getNotifications().contains(child)) return true;
+		@SuppressWarnings("unchecked")
+		private static boolean containerContains(DraggableContainer<Notification> parent, Notification child) {
+			if (parent.getItems().contains(child)) return true;
 
-			for (Notification n : parent.getNotifications())
-				if (n instanceof DraggableContainer && containerContains((DraggableContainer)n, child)) return true;
+			for (Notification n : parent.getItems())
+				if (n instanceof DraggableContainer && containerContains((DraggableContainer<Notification>)n, child)) return true;
 
 			return false;
 		}
@@ -153,7 +155,8 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 	}
 
 	protected final N notification;
-	protected final DraggableContainer container;
+	protected final DraggableContainer<Notification> container;
+	protected final DropSpaceSystem<Notification> system;
 	protected final AdvancedNotificationsPlugin plugin;
 
 	private JPopupMenu menuPopup = new JPopupMenu();
@@ -163,26 +166,27 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				container.getNotifications().add(notification.clone());
+				container.getItems().add(notification.clone());
 				plugin.rebuildPluginPanel();
 			}
 		}));
 	}
 
-	public NotificationPanel(N notification, DraggableContainer container)
+	public NotificationPanel(N notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
 	{
 		this.notification = notification;
+		this.system = system;
 		this.container = container;
 		plugin = notification.getPlugin();
 
 		addMouseListener(this);
 	}
 
-	public static NotificationPanel<?> buildPanel(DraggableContainer container, Notification notif)
+	public static NotificationPanel<?> buildPanel(Notification notif, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
 	{
-		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, container);
-		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, container);
-		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, container);
+		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, system, container);
+		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, system, container);
+		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, system, container);
 
 		return null;
 	}
@@ -230,7 +234,7 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			{
 				if (e.getButton() == MouseEvent.BUTTON1)
 				{
-					panel.container.getNotifications().remove(panel.notification);
+					panel.container.getItems().remove(panel.notification);
 					panel.notification.getPlugin().updateConfig();
 					panel.notification.getPlugin().rebuildPluginPanel();
 				}

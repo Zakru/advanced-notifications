@@ -3,6 +3,8 @@ package com.github.zakru.advancednotifications.ui;
 import com.github.zakru.advancednotifications.DraggableContainer;
 import com.github.zakru.advancednotifications.EmptyNotification;
 import com.github.zakru.advancednotifications.InventoryComparator;
+import com.github.zakru.advancednotifications.Notification;
+
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
@@ -13,9 +15,9 @@ public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner(spinnerModel);
 
-	public EmptyNotificationPanel(EmptyNotification notification, DraggableContainer container)
+	public EmptyNotificationPanel(EmptyNotification notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
 	{
-		super(notification, container);
+		super(notification, system, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
