@@ -44,3 +44,7 @@ be renamed. Add notifications by dragging them into it.
 You can drag notifications by their title to reorder and organize them.
 
 ![Example](https://i.imgur.com/hgwMLUS.gif)
+
+## Cloning
+
+Notifications can be cloned by right-clicking their title and selecting "Clone".
