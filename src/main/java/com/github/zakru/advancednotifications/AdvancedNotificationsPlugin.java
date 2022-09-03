@@ -36,8 +36,8 @@ import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(
 	name = "Advanced Notifications",
-	tags = {"notifications", "inventory", "item"},
-	description = "An advanced notifications system"
+	tags = {"notifications", "inventory", "item", "idle"},
+	description = "An advanced notification system"
 )
 public class AdvancedNotificationsPlugin extends Plugin implements DraggableContainer<Notification>
 {
