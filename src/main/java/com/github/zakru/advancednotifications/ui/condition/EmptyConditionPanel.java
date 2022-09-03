@@ -1,27 +1,35 @@
-package com.github.zakru.advancednotifications.ui;
+package com.github.zakru.advancednotifications.ui.condition;
 
 import com.github.zakru.advancednotifications.DraggableContainer;
+import com.github.zakru.advancednotifications.condition.Condition;
+import com.github.zakru.advancednotifications.condition.EmptyCondition;
+import com.github.zakru.advancednotifications.condition.InventoryChecker;
 import com.github.zakru.advancednotifications.notification.EmptyNotification;
 import com.github.zakru.advancednotifications.notification.InventoryComparator;
 import com.github.zakru.advancednotifications.notification.Notification;
-
+import com.github.zakru.advancednotifications.ui.DropSpaceSystem;
+import com.github.zakru.advancednotifications.ui.notification.NotificationPanel;
 import net.runelite.client.ui.ColorScheme;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
+public class EmptyConditionPanel extends ConditionPanel<EmptyCondition>
 {
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner(spinnerModel);
 
-	public EmptyNotificationPanel(EmptyNotification notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
+	public EmptyConditionPanel(
+		EmptyCondition condition,
+		DropSpaceSystem<Condition> system,
+		DraggableContainer<Condition> container
+	)
 	{
-		super(notification, system, container);
+		super(condition, system, container);
 		setLayout(new BorderLayout());
 		setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
-		DefaultTypePanel typePanel = new DefaultTypePanel(this, "Empty Space");
+		DefaultTypePanel typePanel = new DefaultTypePanel(this, "Empty Space Condition");
 		typePanel.addDefaultVisualListener();
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
@@ -34,22 +42,22 @@ public class EmptyNotificationPanel extends NotificationPanel<EmptyNotification>
 		JLabel countLabel = new JLabel("Count ");
 		countLabel.setForeground(Color.WHITE);
 
-		JComboBox<InventoryComparator> comparatorBox = new JComboBox<>(InventoryComparator.COMPARATORS);
-		comparatorBox.setSelectedItem(notification.getComparator().object);
+		JComboBox<InventoryChecker> comparatorBox = new JComboBox<>(InventoryChecker.CHECKERS);
+		comparatorBox.setSelectedItem(condition.getChecker().object);
 		comparatorBox.setPreferredSize(new Dimension(50, 20));
 		comparatorBox.setMaximumRowCount(9);
 		comparatorBox.addItemListener(e -> {
-			notification.getComparator().object = (InventoryComparator)comparatorBox.getSelectedItem();
-			notification.getPlugin().updateConfig();
-			countSpinner.setVisible(notification.getComparator().object.takesParam());
+			condition.getChecker().object = (InventoryChecker)comparatorBox.getSelectedItem();
+			condition.getPlugin().updateConfig();
+			countSpinner.setVisible(condition.getChecker().object.takesParam());
 		});
 
-		countSpinner.setValue(notification.getComparatorParam());
+		countSpinner.setValue(condition.getCheckerParam());
 		countSpinner.setPreferredSize(new Dimension(64, 20));
-		countSpinner.setVisible(notification.getComparator().object.takesParam());
+		countSpinner.setVisible(condition.getChecker().object.takesParam());
 		countSpinner.addChangeListener(e -> {
-			notification.setComparatorParam((Integer)countSpinner.getValue());
-			notification.getPlugin().updateConfig();
+			condition.setCheckerParam((Integer)countSpinner.getValue());
+			condition.getPlugin().updateConfig();
 		});
 
 		paramsPanel.add(countLabel);

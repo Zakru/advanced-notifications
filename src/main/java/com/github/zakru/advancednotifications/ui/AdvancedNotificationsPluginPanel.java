@@ -1,33 +1,24 @@
 package com.github.zakru.advancednotifications.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-
-import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
-import com.github.zakru.advancednotifications.DraggableContainer;
-import com.github.zakru.advancednotifications.EmptyNotification;
-import com.github.zakru.advancednotifications.ItemNotification;
-import com.github.zakru.advancednotifications.Notification;
-import com.github.zakru.advancednotifications.NotificationGroup;
-
+import com.github.zakru.advancednotifications.*;
+import com.github.zakru.advancednotifications.condition.Condition;
+import com.github.zakru.advancednotifications.notification.EmptyNotification;
+import com.github.zakru.advancednotifications.notification.ItemNotification;
+import com.github.zakru.advancednotifications.notification.Notification;
+import com.github.zakru.advancednotifications.notification.NotificationGroup;
+import com.github.zakru.advancednotifications.ui.notification.NotificationGroupPanel;
+import com.github.zakru.advancednotifications.ui.notification.NotificationPanel;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 public class AdvancedNotificationsPluginPanel extends PluginPanel implements DropSpaceSystem<Notification>
 {
@@ -45,6 +36,43 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 	@Getter
 	@Setter
 	private DropSpace<Notification> dragHovering;
+
+	@Getter
+	private Condition draggingCondition;
+	@Getter
+	private DraggableContainer<Condition> draggingFromCondition;
+	@Getter
+	@Setter
+	private DropSpace<Condition> dragHoveringCondition;
+
+	private DropSpaceSystem<Condition> conditionSystem = new DropSpaceSystem<Condition>() {
+
+		@Override
+		public Condition getDragging() {
+			return draggingCondition;
+		}
+
+		@Override
+		public void setDragging(Condition c, DraggableContainer from) {
+			draggingCondition = c;
+			draggingFromCondition = from;
+		}
+
+		@Override
+		public DraggableContainer getDraggingFrom() {
+			return draggingFromCondition;
+		}
+
+		@Override
+		public DropSpace getDragHovering() {
+			return dragHoveringCondition;
+		}
+
+		@Override
+		public void setDragHovering(DropSpace space) {
+			dragHoveringCondition = space;
+		}
+	};
 
 	static
 	{
@@ -73,7 +101,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getItems().add(new ItemNotification(plugin));
+				plugin.getDraggableItems().add(new ItemNotification(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -83,7 +111,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getItems().add(new EmptyNotification(plugin));
+				plugin.getDraggableItems().add(new EmptyNotification(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -93,7 +121,7 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				plugin.getItems().add(new NotificationGroup(plugin));
+				plugin.getDraggableItems().add(new NotificationGroup(plugin));
 				plugin.updateConfig();
 				rebuild();
 			}
@@ -137,14 +165,14 @@ public class AdvancedNotificationsPluginPanel extends PluginPanel implements Dro
 		notificationView.removeAll();
 
 		int index = 0;
-		notificationView.add(new DropSpace<Notification>(this, plugin, index++));
-		for (final Notification notif : plugin.getItems())
+		notificationView.add(new DropSpace<>(this, plugin, index++));
+		for (final Notification notif : plugin.getDraggableItems())
 		{
-			NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, this, plugin);
+			NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, this, plugin, conditionSystem);
 			if (panel != null)
 			{
 				notificationView.add(panel);
-				notificationView.add(new DropSpace<Notification>(this, plugin, index++));
+				notificationView.add(new DropSpace<>(this, plugin, index++));
 			}
 		}
 

@@ -3,8 +3,10 @@ package com.github.zakru.advancednotifications.notification;
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.InventoryEvent;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 public class EmptyNotification extends Notification
 {
 	@Getter

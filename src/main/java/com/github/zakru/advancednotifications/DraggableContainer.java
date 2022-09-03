@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface DraggableContainer<T>
 {
-	List<T> getItems();
+	List<T> getDraggableItems();
+	default Notification getRoot() { return null; }
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.github.zakru.advancednotifications.condition.ConditionTypes;
 import com.github.zakru.advancednotifications.notification.*;
 import com.github.zakru.advancednotifications.ui.AdvancedNotificationsPluginPanel;
 import com.google.gson.Gson;
@@ -74,6 +75,7 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 
 	static {
 		NotificationTypes.registerAll();
+		ConditionTypes.registerAll();
 	}
 
 	@Override
@@ -223,7 +225,7 @@ public class AdvancedNotificationsPlugin extends Plugin implements DraggableCont
 	}
 
 	@Override
-	public List<Notification> getItems()
+	public List<Notification> getDraggableItems()
 	{
 		return notifications;
 	}

@@ -1,4 +1,4 @@
-package com.github.zakru.advancednotifications.ui;
+package com.github.zakru.advancednotifications.ui.notification;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,10 +17,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.github.zakru.advancednotifications.DraggableContainer;
+import com.github.zakru.advancednotifications.condition.Condition;
 import com.github.zakru.advancednotifications.notification.InventoryComparator;
 import com.github.zakru.advancednotifications.notification.ItemNotification;
 import com.github.zakru.advancednotifications.notification.Notification;
 
+import com.github.zakru.advancednotifications.ui.DropSpaceSystem;
+import com.github.zakru.advancednotifications.ui.condition.ConditionPanel;
 import net.runelite.client.ui.ColorScheme;
 
 public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
@@ -28,7 +31,12 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 	private final SpinnerModel spinnerModel = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 	private final JSpinner countSpinner = new JSpinner(spinnerModel);
 
-	public ItemNotificationPanel(ItemNotification notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
+	public ItemNotificationPanel(
+		ItemNotification notification,
+		DropSpaceSystem<Notification> system,
+		DraggableContainer<Notification> container,
+		DropSpaceSystem<Condition> conditionSystem
+	)
 	{
 		super(notification, system, container);
 		setLayout(new BorderLayout());
@@ -95,7 +103,13 @@ public class ItemNotificationPanel extends NotificationPanel<ItemNotification>
 		contentPanel.add(paramsPanel, BorderLayout.SOUTH);
 
 		add(typePanel, BorderLayout.NORTH);
-		add(contentPanel, BorderLayout.CENTER);
+		if (notification.isConfiguring())
+		{
+			ConditionPanel cond = ConditionPanel.buildPanel(notification.getCondition(), conditionSystem, notification.getConditionContainer());
+			cond.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR));
+			add(cond, BorderLayout.CENTER);
+		}
+		add(contentPanel, BorderLayout.SOUTH);
 	}
 
 	private void updateItem(JTextField field)

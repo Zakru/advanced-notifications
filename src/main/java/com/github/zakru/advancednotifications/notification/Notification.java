@@ -1,14 +1,18 @@
 package com.github.zakru.advancednotifications.notification;
 
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
+import com.github.zakru.advancednotifications.DraggableContainer;
 import com.github.zakru.advancednotifications.condition.Condition;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public abstract class Notification implements Cloneable
+@NoArgsConstructor
+public abstract class Notification
 {
 	@Getter
 	@Setter
@@ -16,10 +20,29 @@ public abstract class Notification implements Cloneable
 
 	@Getter
 	@Setter
-	private  boolean enabled = true;
+	private boolean enabled = true;
 
-	//@Getter
-	//private List<Condition> conditions = new ArrayList<>();
+	@Getter
+	@Setter
+	private transient boolean configuring = false;
+
+	@Getter
+	@Setter
+	private Condition condition = null;
+
+	@Getter
+	private final transient DraggableContainer<Condition> conditionContainer = new DraggableContainer<Condition>() {
+
+		@Override
+		public List<Condition> getDraggableItems() {
+			return Collections.singletonList(condition);
+		}
+
+		@Override
+		public Notification getRoot() {
+			return Notification.this;
+		}
+	};
 
 	public Notification(AdvancedNotificationsPlugin plugin)
 	{
@@ -28,7 +51,7 @@ public abstract class Notification implements Cloneable
 
 	public void tryNotify(Object event)
 	{
-		if (!enabled) return;// || conditions.stream().anyMatch(c -> !c.isFulfilled())) return;
+		if (!enabled || (condition != null && !condition.isFulfilled())) return;
 
 		notify(event);
 	}

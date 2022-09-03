@@ -2,6 +2,8 @@ package com.github.zakru.advancednotifications.notification;
 
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.condition.CheckerAdapter;
+import com.github.zakru.advancednotifications.condition.Condition;
+import com.github.zakru.advancednotifications.condition.ConditionAdapter;
 import com.github.zakru.advancednotifications.condition.InventoryChecker;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
@@ -22,7 +24,7 @@ public class NotificationAdapter extends TypeAdapter<Notification>
 		gson = new GsonBuilder()
 			.registerTypeAdapter(Notification.class, this)
 			.registerTypeAdapter(InventoryComparator.Pointer.class, new ComparatorAdapter())
-			//.registerTypeAdapter(InventoryChecker.Pointer.class, new CheckerAdapter())
+			.registerTypeAdapter(Condition.class, new ConditionAdapter(plugin))
 			.create();
 	}
 

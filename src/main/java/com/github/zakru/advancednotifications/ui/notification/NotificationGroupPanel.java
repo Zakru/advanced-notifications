@@ -1,4 +1,4 @@
-package com.github.zakru.advancednotifications.ui;
+package com.github.zakru.advancednotifications.ui.notification;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,9 +18,13 @@ import javax.swing.JTextField;
 
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.DraggableContainer;
+import com.github.zakru.advancednotifications.condition.Condition;
 import com.github.zakru.advancednotifications.notification.Notification;
 import com.github.zakru.advancednotifications.notification.NotificationGroup;
 
+import com.github.zakru.advancednotifications.ui.DropSpace;
+import com.github.zakru.advancednotifications.ui.DropSpaceSystem;
+import com.github.zakru.advancednotifications.ui.condition.ConditionPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -55,7 +59,12 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 		EXPAND_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(expandIcon, 0.53f));
 	}
 
-	public NotificationGroupPanel(NotificationGroup notification, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
+	public NotificationGroupPanel(
+		NotificationGroup notification,
+		DropSpaceSystem<Notification> system,
+		DraggableContainer<Notification> container,
+		DropSpaceSystem<Condition> conditionSystem
+	)
 	{
 		super(notification, system, container);
 		setLayout(new BorderLayout());
@@ -184,6 +193,13 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 
 		add(northPanel, BorderLayout.NORTH);
 
+		if (notification.isConfiguring())
+		{
+			ConditionPanel cond = ConditionPanel.buildPanel(notification.getCondition(), conditionSystem, notification.getConditionContainer());
+			cond.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, ColorScheme.DARK_GRAY_COLOR));
+			add(cond, BorderLayout.CENTER);
+		}
+
 		if (!notification.isCollapsed())
 		{
 			JPanel notificationView = new JPanel();
@@ -196,9 +212,9 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 
 			int index = 0;
 			notificationView.add(new DropSpace<Notification>(system, notification, index++));
-			for (final Notification notif : notification.getItems())
+			for (final Notification notif : notification.getDraggableItems())
 			{
-				NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, system, notification);
+				NotificationPanel<?> panel = NotificationPanel.buildPanel(notif, system, notification, conditionSystem);
 				if (panel != null)
 				{
 					notificationView.add(panel);
@@ -206,7 +222,7 @@ public class NotificationGroupPanel extends NotificationPanel<NotificationGroup>
 				}
 			}
 
-			add(notificationView, BorderLayout.CENTER);
+			add(notificationView, BorderLayout.SOUTH);
 		}
 	}
 

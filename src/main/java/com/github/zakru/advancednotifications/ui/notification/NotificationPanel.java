@@ -1,10 +1,16 @@
-package com.github.zakru.advancednotifications.ui;
+package com.github.zakru.advancednotifications.ui.notification;
 
 import com.github.zakru.advancednotifications.*;
+import com.github.zakru.advancednotifications.condition.Condition;
+import com.github.zakru.advancednotifications.condition.EmptyCondition;
+import com.github.zakru.advancednotifications.condition.ItemCondition;
 import com.github.zakru.advancednotifications.notification.EmptyNotification;
 import com.github.zakru.advancednotifications.notification.ItemNotification;
 import com.github.zakru.advancednotifications.notification.Notification;
 import com.github.zakru.advancednotifications.notification.NotificationGroup;
+import com.github.zakru.advancednotifications.ui.DropSpace;
+import com.github.zakru.advancednotifications.ui.DropSpaceSystem;
+import com.github.zakru.advancednotifications.ui.EnabledButton;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
@@ -23,12 +29,27 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 	private static final ImageIcon DELETE_ICON;
 	private static final ImageIcon DELETE_HOVER_ICON;
 
+	private static final ImageIcon CONFIGURE_ICON;
+	private static final ImageIcon CONFIGURE_HOVER_ICON;
+	private static final ImageIcon CONFIGURE_ACTIVE_ICON;
+	private static final ImageIcon CONFIGURE_ACTIVE_HOVER_ICON;
+
 	static
 	{
 		final BufferedImage deleteIcon
 			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "delete_icon.png");
 		DELETE_ICON = new ImageIcon(deleteIcon);
 		DELETE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(deleteIcon, 0.53f));
+
+		final BufferedImage configureIcon
+			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "configure_icon.png");
+		CONFIGURE_ICON = new ImageIcon(configureIcon);
+		CONFIGURE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(configureIcon, 0.53f));
+
+		final BufferedImage configureActiveIcon
+			= ImageUtil.getResourceStreamFromClass(AdvancedNotificationsPlugin.class, "configure_active_icon.png");
+		CONFIGURE_ACTIVE_ICON = new ImageIcon(configureActiveIcon);
+		CONFIGURE_ACTIVE_HOVER_ICON = new ImageIcon(ImageUtil.alphaOffset(configureActiveIcon, 0.53f));
 	}
 
 	protected static class DragStarter extends MouseAdapter
@@ -74,12 +95,12 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 					{
 						if (system.getDraggingFrom() != space.getContainer())
 						{
-							system.getDraggingFrom().getItems().remove(system.getDragging());
-							space.getContainer().getItems().add(space.getIndex(), system.getDragging());
+							system.getDraggingFrom().getDraggableItems().remove(system.getDragging());
+							space.getContainer().getDraggableItems().add(space.getIndex(), system.getDragging());
 						}
 						else
 						{
-							List<Notification> notifications = panel.container.getItems();
+							List<Notification> notifications = panel.container.getDraggableItems();
 							int originalIndex = notifications.indexOf(panel.notification);
 							notifications.remove(panel.notification);
 							int index = space.getIndex();
@@ -100,9 +121,9 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 
 		@SuppressWarnings("unchecked")
 		private static boolean containerContains(DraggableContainer<Notification> parent, Notification child) {
-			if (parent.getItems().contains(child)) return true;
+			if (parent.getDraggableItems().contains(child)) return true;
 
-			for (Notification n : parent.getItems())
+			for (Notification n : parent.getDraggableItems())
 				if (n instanceof DraggableContainer && containerContains((DraggableContainer<Notification>)n, child)) return true;
 
 			return false;
@@ -170,7 +191,7 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				container.getItems().add(notification.clone());
+				container.getDraggableItems().add(notification.clone());
 				plugin.rebuildPluginPanel();
 			}
 		}));
@@ -186,11 +207,16 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 		addMouseListener(this);
 	}
 
-	public static NotificationPanel<?> buildPanel(Notification notif, DropSpaceSystem<Notification> system, DraggableContainer<Notification> container)
+	public static NotificationPanel<?> buildPanel(
+		Notification notif,
+		DropSpaceSystem<Notification> system,
+		DraggableContainer<Notification> container,
+		DropSpaceSystem<Condition> conditionSystem
+	)
 	{
-		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, system, container);
-		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, system, container);
-		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, system, container);
+		if (notif instanceof ItemNotification) return new ItemNotificationPanel((ItemNotification)notif, system, container, conditionSystem);
+		if (notif instanceof EmptyNotification) return new EmptyNotificationPanel((EmptyNotification)notif, system, container, conditionSystem);
+		if (notif instanceof NotificationGroup) return new NotificationGroupPanel((NotificationGroup)notif, system, container, conditionSystem);
 
 		return null;
 	}
@@ -238,9 +264,9 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			{
 				if (e.getButton() == MouseEvent.BUTTON1)
 				{
-					panel.container.getItems().remove(panel.notification);
-					panel.notification.getPlugin().updateConfig();
-					panel.notification.getPlugin().rebuildPluginPanel();
+					panel.container.getDraggableItems().remove(panel.notification);
+					panel.plugin.updateConfig();
+					panel.plugin.rebuildPluginPanel();
 				}
 			}
 
@@ -257,9 +283,91 @@ public abstract class NotificationPanel<N extends Notification> extends JPanel i
 			}
 		});
 
-		actions.add(new EnabledButton(panel.notification.getPlugin(), panel.notification));
+		JLabel configureButton = new JLabel(panel.notification.getCondition() != null ? CONFIGURE_ACTIVE_ICON : CONFIGURE_ICON);
+		if (panel.notification.isConfiguring())
+		{
+			configureButton.setOpaque(true);
+			configureButton.setBackground(ColorScheme.MEDIUM_GRAY_COLOR);
+		}
+		configureButton.setToolTipText(panel.notification.getCondition() != null ? "Toggle condition configuration" : "Add condition");
+		JPopupMenu addPopup = createAddConditionMenu(panel);
+		configureButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent e)
+			{
+				if (panel.notification.getCondition() == null)
+					addPopup.show(configureButton, e.getX(), e.getY());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				if (panel.notification.getCondition() != null)
+				{
+					if (e.getButton() == MouseEvent.BUTTON1)
+					{
+						panel.notification.setConfiguring(!panel.notification.isConfiguring());
+						panel.plugin.rebuildPluginPanel();
+					}
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e)
+			{
+				configureButton.setIcon(panel.notification.getCondition() != null ? CONFIGURE_ACTIVE_HOVER_ICON : CONFIGURE_HOVER_ICON);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+				configureButton.setIcon(panel.notification.getCondition() != null ? CONFIGURE_ACTIVE_ICON : CONFIGURE_ICON);
+			}
+		});
+
+		actions.add(configureButton);
+		actions.add(new EnabledButton(panel.plugin, panel.notification));
 		actions.add(deleteButton);
 		
 		return actions;
+	}
+
+	protected static JPopupMenu createAddConditionMenu(NotificationPanel<?> panel) {
+		JPopupMenu addPopup = new JPopupMenu();
+		addPopup.add(new JMenuItem(new AbstractAction("Inventory")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				panel.notification.setCondition(new ItemCondition(panel.plugin));
+				panel.notification.setConfiguring(true);
+				panel.plugin.updateConfig();
+				panel.plugin.rebuildPluginPanel();
+			}
+		}));
+		addPopup.add(new JMenuItem(new AbstractAction("Empty Space")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				panel.notification.setCondition(new EmptyCondition(panel.plugin));
+				panel.notification.setConfiguring(true);
+				panel.plugin.updateConfig();
+				panel.plugin.rebuildPluginPanel();
+			}
+		}));
+		/*addPopup.add(new JMenuItem(new AbstractAction("Group")
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				panel.notification.setCondition().add(new ConditionGroup(panel.notification.getPlugin()));
+				panel.notification.getPlugin().updateConfig();
+				panel.notification.getPlugin().rebuildPluginPanel();
+			}
+		}));*/
+
+		return addPopup;
 	}
 }

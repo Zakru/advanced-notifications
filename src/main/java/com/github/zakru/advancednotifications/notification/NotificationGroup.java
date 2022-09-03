@@ -3,11 +3,13 @@ package com.github.zakru.advancednotifications.notification;
 import com.github.zakru.advancednotifications.AdvancedNotificationsPlugin;
 import com.github.zakru.advancednotifications.DraggableContainer;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 public class NotificationGroup extends Notification implements DraggableContainer<Notification>
 {
 	@Getter
@@ -41,7 +43,7 @@ public class NotificationGroup extends Notification implements DraggableContaine
 	}
 
 	@Override
-	public List<Notification> getItems() {
+	public List<Notification> getDraggableItems() {
 		return notifications;
 	}
 }
